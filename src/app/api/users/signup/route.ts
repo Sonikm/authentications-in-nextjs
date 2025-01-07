@@ -13,12 +13,13 @@ export async function POST(request: NextRequest) {
     const reqBody = await request.json();
     const { username, email, password } = reqBody;
 
-    // Validation
+    // TODO: Validation
     console.log(reqBody);
 
     // find first user
     const user = await User.findOne({ email });
 
+    // User already exist
     if (user) {
       return NextResponse.json(
         { error: "User already exists" },
@@ -36,15 +37,20 @@ export async function POST(request: NextRequest) {
     });
 
     const savedUser = await newUser.save();
-    console.log(savedUser);
+    console.log("saved user: ", savedUser);
+
+    const userId = savedUser._id;
 
     // send verification email
-    await sendEmail({email, emailType: "VERIFY", userId: savedUser._id });
+    await sendEmail({ email, emailType: "VERIFY", userId: userId });
 
-    return NextResponse.json({message: "User registered successfully", success: true, savedUser, })
+    return NextResponse.json({
+      message: "User registered successfully",
+      success: true,
+      savedUser,
+    });
 
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
