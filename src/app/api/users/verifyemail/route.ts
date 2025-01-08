@@ -10,11 +10,12 @@ export async function POST(request: NextRequest) {
     const reqBody = await request.json();
     const { token } = reqBody;
 
-    console.log(token);
+    console.log("Token received for verification.");
 
+    // Find the user with the token and ensure the token hasn't expired
     const user = await User.findOne({
       verifyToken: token,
-      verifyTokenExpiry: { $gt: Date.now() }, // greater from current time
+      verifyTokenExpiry: { $gt: Date.now() }, // Ensure expiry is in the future
     });
 
     if (!user) {

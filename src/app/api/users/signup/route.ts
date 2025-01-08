@@ -14,6 +14,21 @@ export async function POST(request: NextRequest) {
     const { username, email, password } = reqBody;
 
     // TODO: Validation
+    if (!username || !email || !password) {
+      return NextResponse.json(
+        { error: "All fields are required" },
+        { status: 400 }
+      );
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { error: "Invalid email format" },
+        { status: 400 }
+      );
+    }
+
     console.log(reqBody);
 
     // find first user
@@ -27,6 +42,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // A salt is a random value added to a password before hashing. It ensures that even if two users have the same password, their hashed passwords will be different
     const salt = await bcryptjs.genSalt(10);
     const hashedPassword = await bcryptjs.hash(password, salt);
 
@@ -47,7 +63,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       message: "User registered successfully",
       success: true,
-      savedUser,
+      user: {
+        id: savedUser._id,
+        username: savedUser.username,
+        email: savedUser.email,
+      },
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

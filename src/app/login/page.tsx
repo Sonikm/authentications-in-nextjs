@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { toast } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -22,11 +22,18 @@ const LoginPage = () => {
       }
       setIsloading(true);
       const response = await axios.post("/api/users/login", user);
-      console.log("Login success ", response.data);
+      console.log("Login success ", response);
+      toast.success("Login Successfully");
       router.push("/profile");
     } catch (error: any) {
       console.log("Login error");
-      toast.error(error.response.data);
+
+      // If error response contains an error message, show it
+      const errorMessage =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Something went wrong.";
+      toast.error(errorMessage);
     } finally {
       setIsloading(false);
       setButtonDisabled(true);
@@ -34,10 +41,7 @@ const LoginPage = () => {
   };
 
   useEffect(() => {
-    if (
-      user.email.length > 0 &&
-      user.password.length > 0
-    ) {
+    if (user.email.length > 0 && user.password.length > 0) {
       setButtonDisabled(false);
     } else {
       setButtonDisabled(true);
@@ -77,6 +81,7 @@ const LoginPage = () => {
       <Link className="underline" href={"/signup"}>
         Visit Signup Page
       </Link>
+      <Toaster />
     </div>
   );
 };

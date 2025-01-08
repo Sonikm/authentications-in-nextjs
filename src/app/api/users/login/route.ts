@@ -4,6 +4,7 @@ import { connect } from "@/dbConfig/dbConfig";
 import User from "@/models/userModel";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+// import { sendEmail } from "@/helpers/mailer";
 
 connect();
 
@@ -20,8 +21,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    console.log("User exits");
     // Check password
     const validPassword = await bcryptjs.compare(password, user.password);
 
@@ -38,11 +37,19 @@ export async function POST(request: NextRequest) {
       email: user.email,
     };
 
+    // console.log("Is verified", user.isVerified);
+    //* Uncomment this line if you want to verify user on login if user is not verified
+    // if(!user.isVerified){
+    //   // send verification email
+    //   await sendEmail({email: user.email, emailType: "VERIFY", userId: user._id});
+    //   return NextResponse.json({error: "Your email is not verified. Please check your inbox for the verification link." }, {status: 400});
+    // }
+    
     const token = jwt.sign(tokenData, process.env.TOKEN_SECRET!, { expiresIn: "1d" });
     const response = NextResponse.json({message: "Logged In Success", success: true,})
-
+    
     response.cookies.set("token", token, {
-      httpOnly: true,
+      httpOnly: true, // prevent from client side access, like javacsript
     })
 
     return response;
