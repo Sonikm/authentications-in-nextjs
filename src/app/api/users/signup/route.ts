@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     await sendEmail({ email, emailType: "VERIFY", userId: userId });
 
     return NextResponse.json({
-      message: "User registered successfully",
+      message: "User registered successfully... and email verification link has been sent to your email.",
       success: true,
       user: {
         id: savedUser._id,

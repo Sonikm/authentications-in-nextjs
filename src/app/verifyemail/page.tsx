@@ -1,15 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-
 import axios from "axios";
-// import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
-const VerifyEmailPage = () => {
-  // const router = useRouter();
-  const [token, setToken] = useState("");
+const VerifyEmailPage = ({searchParams}: any) => {
   const [verified, setVerified] = useState(false);
   const [error, setError] = useState(false);
+  const token = searchParams?.token;
 
   const verifyUserEmail = async () => {
     try {
@@ -24,14 +21,6 @@ const VerifyEmailPage = () => {
     }
   };
 
-  // get token when hit the url
-  useEffect(() => {
-    const urlToken = window.location.search.split("=")[1];
-    setToken(urlToken || "");
-    // const {query} = router;
-    // const urlToken = query.token
-  }, []);
-
   useEffect(() => {
     if (token.length > 0) {
       verifyUserEmail();
@@ -45,9 +34,8 @@ const VerifyEmailPage = () => {
         {token ? token : "No token"}
       </h2>
       {verified && (
-        <div className="">
-          <h2>Verified</h2>
-          <link href="/login">Visit to Login</link>
+        <div className="flex flex-col items-center justify-center my-2">
+          <h2>Verified 🌻 you can close this tab 😊</h2>
         </div>
       )}
       {error && (

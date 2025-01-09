@@ -3,23 +3,35 @@ import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  const token = request.cookies.get("token")?.value || "";
+  const cookiesToken = request.cookies.get("token")?.value || "";
+  const tokenQuery = request.nextUrl.searchParams.get("token");
 
-  // Allow access to "/verifyemail" without redirection
-  // if (path === "/verifyemail") {
-  //   return NextResponse.next();
-  // }
+  //If you want to verification on login as well then remove verifyemail option from public path
+  const isPublicPath =
+    path === "/login" ||
+    path === "/signup" ||
+    path === "/verifyemail" ||
+    path === "/resetpassword" ||
+    path === "/updatepassword";
 
-  //* If you want to verification on login as well then remove verifyemail option from public path
-  const isPublicPath = path === "/login" || path === "/signup" || path === "/verifyemail";
+  // If user tries to access protected email routes, ensure a valid token is present
+  const requiresEmailToken =
+    path === "/verifyemail" ||
+    path === "/updatepassword";
+
+  if (requiresEmailToken && !tokenQuery) {
+    return NextResponse.redirect(
+      new URL("/not-found", request.url)
+    );
+  }
 
   // If the user is trying to access public paths (login/signup) and they already have a token, redirect to home
-  if (isPublicPath && token) {
+  if (isPublicPath && cookiesToken) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
   // If the user is trying to access a protected path and does not have a token, redirect to login
-  if (!isPublicPath && !token) {
+  if (!isPublicPath && !cookiesToken) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -33,6 +45,8 @@ export const config = {
     "/signup",
     "/profile",
     "/verifyemail",
+    "/resetpassword",
+    "/updatepassword",
     "/profile/:path*",
   ],
 };

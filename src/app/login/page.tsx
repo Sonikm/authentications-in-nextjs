@@ -12,10 +12,11 @@ const LoginPage = () => {
     email: "",
     password: "",
   });
-  const [buttonDisabled, setButtonDisabled] = useState(false);
+  const [buttonDisabled, setButtonDisabled] = useState(true);
   const [isLoading, setIsloading] = useState(false);
 
   const onLogin = async () => {
+    if (isLoading || buttonDisabled) return;
     try {
       if (user.email === "" || user.password === "") {
         return toast.error("User data required");
@@ -35,6 +36,7 @@ const LoginPage = () => {
         "Something went wrong.";
       toast.error(errorMessage);
     } finally {
+      setUser({ email: "", password: "" });
       setIsloading(false);
       setButtonDisabled(true);
     }
@@ -73,14 +75,20 @@ const LoginPage = () => {
       <button
         onClick={onLogin}
         className={`${
-          buttonDisabled ? "bg-blue-500 cursor-not-allowed" : "bg-blue-700"
-        }  p-2 rounded-lg border border-gray-300 px-4 m-4`}
+          buttonDisabled || isLoading
+            ? "cursor-not-allowed opacity-50"
+            : "cursor-pointer"
+        } bg-blue-500 p-2 rounded-lg my-2`}
       >
-        Login
+        {isLoading ? "Loading..." : " Login"}
       </button>
       <Link className="underline" href={"/signup"}>
         Visit Signup Page
       </Link>
+      <Link className="underline" href={"/resetpassword"}>
+        Reset Password
+      </Link>
+
       <Toaster />
     </div>
   );

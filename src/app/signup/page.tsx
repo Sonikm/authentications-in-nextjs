@@ -33,6 +33,7 @@ const SignupPage = () => {
   };
 
   const onSignup = async () => {
+    if (isLoading || buttonDisabled) return;
     try {
       if (validation()) {
         setIsloading(true);
@@ -46,6 +47,11 @@ const SignupPage = () => {
     } finally {
       setIsloading(false);
       setButtonDisabled(true);
+      setUser({
+        email: "",
+        username: "",
+        password: "",
+      });
     }
   };
 
@@ -97,10 +103,12 @@ const SignupPage = () => {
       <button
         onClick={onSignup}
         className={`${
-          buttonDisabled ? "bg-blue-500 cursor-not-allowed" : "bg-blue-700"
-        }  p-2 rounded-lg border border-gray-300 px-4 m-4`}
+          buttonDisabled || isLoading
+            ? "cursor-not-allowed opacity-50"
+            : "cursor-pointer"
+        } bg-blue-500 p-2 rounded-lg my-2`}
       >
-        Signup
+        {isLoading ? "Loading..." : "Signup"}
       </button>
       <Link className="underline" href={"/login"}>
         {" "}
